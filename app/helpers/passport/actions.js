@@ -1,40 +1,13 @@
 var passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
   , user = require('./user')
   , successRedirect = geddy.config.passport.successRedirect
   , failureRedirect = geddy.config.passport.failureRedirect
   , cryptPass;
 
 var SUPPORTED_SERVICES = [
-      'twitter'
-    , 'facebook'
-    , 'yammer'
+      'yammer-staging'
+    , 'yammer-production'
     ];
-
-passport.use(new LocalStrategy(function(username, password, done) {
-    geddy.model.User.first({username: username}, function (err, user) {
-      var crypted;
-      if (err) {
-        done(err, null);
-      }
-      if (user) {
-        if (!cryptPass) {
-          cryptPass = require('./index').cryptPass;
-        }
-
-        crypted = cryptPass(password);
-        if (user.password == crypted) {
-          done(null, user);
-        }
-        else {
-          done({message: 'Not found'}, null);
-        }
-      }
-      else {
-        done({message: 'Not found'}, null);
-      }
-    });
-}));
 
 SUPPORTED_SERVICES.forEach(function (item) {
   var config = {
@@ -104,31 +77,10 @@ var actions = new (function () {
         };
       };
 
-  this.local = function (req, resp, params) {
-    var self = this
-      , handler = function (badCredsError, user, noCredsError) {
-          if (badCredsError || noCredsError) {
-            self.redirect(failureRedirect);
-          }
-          else {
-            self.session.set('userId', user.id);
-            self.session.set('authType', 'local');
-            self.redirect(successRedirect);
-          }
-        };
-    // FIXME: Passport wants a request body or query
-    req.body = {
-      username: params.username
-    , password: params.password
-    };
-    passport.authenticate('local', function () {
-      handler.apply(null, arguments);
-    })(req, resp, handler);
-  };
-
-  SUPPORTED_SERVICES.forEach(function (item) {
-    self[item] = _createInit(item);
-    self[item + 'Callback'] = _createCallback(item);
+  SUPPORTED_SERVICES.forEach(function (i) {
+    var item = geddy.string.camelize(i);
+    self[item] = _createInit(i);
+    self[item + 'Callback'] = _createCallback(i);
   });
 
 })();
