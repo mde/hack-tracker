@@ -32,8 +32,19 @@ module.exports = {
       return userData;
     }
   }
-, yammer: {
-    name: 'Yammer'
+, 'yammer-production': {
+    name: 'Yammer Production'
+  , keyField: 'id'
+  , parseProfile: function (profile) {
+      var userData = {
+        givenName: profile._json.first_name || profile.name
+      , familyName: profile._json.last_name
+      };
+      return userData;
+    }
+  }
+, 'yammer-staging': {
+    name: 'Yammer Staging'
   , keyField: 'id'
   , parseProfile: function (profile) {
       var userData = {
