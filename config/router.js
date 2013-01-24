@@ -47,4 +47,5 @@ router.get('/auth/yammer-staging/callback').to('Auth.yammerStagingCallback');
 router.get('/auth/yammer-production').to('Auth.yammerProduction');
 router.get('/auth/yammer-production/callback').to('Auth.yammerProductionCallback');
 router.resource('users');
+router.resource('hacks');
 exports.router = router;
